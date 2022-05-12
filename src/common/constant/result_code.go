@@ -8,7 +8,7 @@ const (
 
 	SelectFailureCode ResponseCode = 500
 
-	SelectSuccessMsg ResponseMsg = "查询成功"
+	SelectSuccessMsg ResponseMsg = "操作成功"
 
-	SelectFailureMsg ResponseMsg = "查询失败"
+	SelectFailureMsg ResponseMsg = "操作成功"
 )

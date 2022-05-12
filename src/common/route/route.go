@@ -24,6 +24,12 @@ func PathRoute(r *gin.Engine) *gin.Engine {
 			controller.PasswordRegister(passwordPath)
 		}
 
+		syncPath := rootPath.Group("/sync")
+
+		{
+			controller.SyncRegister(syncPath)
+		}
+
 	}
 
 	return r
