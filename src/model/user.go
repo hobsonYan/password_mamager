@@ -16,4 +16,5 @@ type User struct {
 	Usrename string `json:"username"`
 	Password string `json:"password"`
 	Phone    string `json:"phone"`
+	Time     int64  `json:"time"`
 }

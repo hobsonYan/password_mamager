@@ -31,3 +31,7 @@ func UpdateDb(isOpen bool) {
 		}
 	}
 }
+
+func GetDb() *gorm.DB {
+	return Db
+}

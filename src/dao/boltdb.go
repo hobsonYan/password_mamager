@@ -69,7 +69,7 @@ func Delete(bucket string, key string) {
 	}
 }
 
-func List(bucket string, pageNum int, pageSize int) ([]string, int) {
+func List(bucket string, key string, pageNum int, pageSize int) ([]string, int) {
 	var list []string
 	db := getDb()
 
@@ -77,7 +77,9 @@ func List(bucket string, pageNum int, pageSize int) ([]string, int) {
 		b := tx.Bucket([]byte(bucket))
 		if b != nil {
 			b.ForEach(func(k, v []byte) error {
-				list = append(list, string(v))
+				if key == "" || key == string(k) {
+					list = append(list, string(v))
+				}
 				return nil
 			})
 		}
@@ -92,15 +94,18 @@ func List(bucket string, pageNum int, pageSize int) ([]string, int) {
 
 	total := len(list)
 
-	var end int
+	if pageNum > 0 && pageSize > 0 {
 
-	if total < pageNum*pageSize {
-		end = total
-	} else {
-		end = pageNum * pageSize
+		var end int
+
+		if total < pageNum*pageSize {
+			end = total
+		} else {
+			end = pageNum * pageSize
+		}
+
+		list = list[(pageNum-1)*pageSize : end]
 	}
-
-	list = list[(pageNum-1)*pageSize : end]
 
 	return list, total
 }

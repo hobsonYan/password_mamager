@@ -17,11 +17,11 @@ func initScheduler() {
 	}
 }
 
-func AddJob(job func(), corn string, tag string) {
+func AddJob(job func(arg string), corn string, tag string) {
 
 	initScheduler()
 
-	s.Cron(corn).Do(job)
+	s.Cron(corn).Do(job, tag)
 
 	s.Tag(tag)
 

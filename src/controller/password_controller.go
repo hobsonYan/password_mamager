@@ -38,15 +38,17 @@ func (c PasswordController) add(ctx *gin.Context) {
 		response.Failure(ctx, constant.SelectFailureCode, "入参绑定失败", nil)
 	} else {
 
+		time := time.Now().UnixNano()
+
 		if len(form.Id) > 0 {
 			// 更新操作
-			password, _ := json.Marshal(model.Password{ID: form.Id, Key: form.Key, Value: form.Value})
+			password, _ := json.Marshal(model.Password{ID: form.Id, Key: form.Key, Value: form.Value, Time: time})
 			dao.Update(user.ID, form.Id, string(password))
 			response.Success(ctx, constant.SelectSuccessCode, "密码修改成功", nil)
 		} else {
 			// 新增操作
 			id, _ := uuid.NewV4()
-			password, _ := json.Marshal(model.Password{ID: id.String(), Key: form.Key, Value: form.Value})
+			password, _ := json.Marshal(model.Password{ID: id.String(), Key: form.Key, Value: form.Value, Time: time})
 			dao.Update(user.ID, id.String(), string(password))
 			response.Success(ctx, constant.SelectSuccessCode, "密码保存成功", nil)
 		}
@@ -69,6 +71,9 @@ func (c PasswordController) delete(ctx *gin.Context) {
 
 	id := ctx.PostForm("id")
 	dao.Delete(user.ID, id)
+
+	dao.Update("delete_password", user.ID, id)
+
 	response.Success(ctx, constant.SelectSuccessCode, "密码删除成功", nil)
 }
 
@@ -79,7 +84,7 @@ func (c PasswordController) list(ctx *gin.Context) {
 	if err := ctx.ShouldBind(&form); err != nil {
 		response.Failure(ctx, constant.SelectFailureCode, "入参绑定失败", nil)
 	} else {
-		list, total := dao.List(user.ID, form.PageNum, form.PageSize)
+		list, total := dao.List(user.ID, "", form.PageNum, form.PageSize)
 
 		var voList []model.ListVo
 		for i := 0; i < len(list); i++ {

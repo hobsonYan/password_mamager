@@ -7,9 +7,12 @@ type AddForm struct {
 }
 
 type Password struct {
-	ID    string `json:"id"`
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	ID        string `json:"id"`
+	User_ID   string `json:"user_id"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	Time      int64  `json:"time"`
+	Is_Delete int    `json:"isDelete"`
 }
 
 type ListForm struct {

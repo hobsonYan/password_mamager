@@ -7,6 +7,7 @@ import (
 	"password_manager/src/dao"
 	"password_manager/src/handler"
 	"password_manager/src/model"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dianjiu/gokit/uuid"
@@ -71,7 +72,7 @@ func (c UserController) register(ctx *gin.Context) {
 			response.Failure(ctx, constant.SelectFailureCode, "用户名已被占用", nil)
 		} else {
 			id, _ := uuid.NewV4()
-			user, _ := json.Marshal(model.User{Id: id.String(), Usrename: form.Usrename, Password: form.Password, Phone: form.Phone})
+			user, _ := json.Marshal(model.User{Id: id.String(), Usrename: form.Usrename, Password: form.Password, Phone: form.Phone, Time: time.Now().UnixNano()})
 
 			dao.Update("user", form.Usrename, string(user))
 
