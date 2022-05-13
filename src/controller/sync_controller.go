@@ -78,15 +78,15 @@ func sync(userId string) {
 	for i := 0; i < len(mysqlPasswordList); i++ {
 		temp, ok := boltMap[mysqlPasswordList[i].ID]
 
-		if !ok && temp.Is_Delete == 0 {
+		if !ok && mysqlPasswordList[i].Is_Delete == 0 {
 			boltUpdateList = append(boltUpdateList, mysqlPasswordList[i])
 		}
 
-		if !ok && temp.Is_Delete == 0 && temp.Time < mysqlPasswordList[i].Time {
+		if ok && mysqlPasswordList[i].Is_Delete == 0 && temp.Time < mysqlPasswordList[i].Time {
 			boltUpdateList = append(boltUpdateList, mysqlPasswordList[i])
 		}
 
-		if ok && temp.Is_Delete == 1 {
+		if ok && mysqlPasswordList[i].Is_Delete == 1 && temp.Is_Delete == 0 {
 			boltDeleteList = append(boltDeleteList, mysqlPasswordList[i])
 		}
 	}
