@@ -20,7 +20,7 @@ var (
 	secret = []byte("16849841325189456f487")
 
 	// 该路由下不校验token
-	noVerify = []interface{}{"/gin/user/login", "/gin/user/register"}
+	noVerify = []interface{}{"/gin/user/login", "/gin/user/register", "/gin/user/netLogin"}
 
 	effectTime = 2 * time.Hour
 )

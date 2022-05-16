@@ -33,5 +33,16 @@ func UpdateDb(isOpen bool) {
 }
 
 func GetDb() *gorm.DB {
+	if Db == nil {
+		var err error
+		Db, err = gorm.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/gin")
+
+		if err != nil {
+			panic(err)
+
+		} else {
+			log.Println("数据库 mysql 连接成功")
+		}
+	}
 	return Db
 }

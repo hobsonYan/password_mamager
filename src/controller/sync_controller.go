@@ -41,13 +41,43 @@ func (c SyncController) open(ctx *gin.Context) {
 
 		dao.UpdateDb(true)
 
-		utils.AddJob(sync, "*/1 * * * *", user.ID)
+		utils.AddJob(syncPassword, "*/1 * * * *", user.ID)
 	}
 
 	response.Success(ctx, constant.SelectSuccessCode, constant.SelectSuccessMsg, nil)
 }
 
-func sync(userId string) {
+func syncUser(user *model.User) {
+
+	db := dao.GetDb()
+
+	// 人员信息同步
+	userString := dao.View("user", user.Username)
+	boltUser := model.User{}
+	json.Unmarshal([]byte(userString), &boltUser)
+
+	var mysqlUser model.User
+	db.Where("id = ?", user.Id).Debug().Find(&mysqlUser)
+
+	if (boltUser == (model.User{}) && mysqlUser != (model.User{})) || mysqlUser.Time > boltUser.Time {
+
+		u, _ := json.Marshal(model.User{Id: mysqlUser.Id, Username: mysqlUser.Username, Password: mysqlUser.Password, Phone: mysqlUser.Phone, Time: mysqlUser.Time})
+
+		dao.Update("user", mysqlUser.Username, string(u))
+	}
+
+	if boltUser != (model.User{}) && mysqlUser == (model.User{}) {
+
+		db.Create(boltUser)
+	}
+
+	if mysqlUser.Time < boltUser.Time {
+
+		db.Model(model.User{}).Where("id = ?", boltUser.Id).Updates(&boltUser)
+	}
+}
+
+func syncPassword(userId string) {
 
 	log.Println("数据同步功能定时任务 run。。。。。")
 	db := dao.GetDb()
