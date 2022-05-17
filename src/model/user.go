@@ -18,3 +18,16 @@ type User struct {
 	Phone    string `json:"phone"`
 	Time     int64  `json:"time"`
 }
+
+type UpdateForm struct {
+	Id           string `form:"id"`
+	New_Username string `form:"newUsername"`
+	New_Password string `form:"newPassword"`
+	New_Phone    string `form:"newPhone"`
+}
+
+type UserVo struct {
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	Phone    string `json:"phone"`
+}
