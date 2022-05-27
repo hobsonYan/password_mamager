@@ -15,6 +15,8 @@ func main() {
 
 	r.Use(handler.JwtVerify)
 
+	r.Use(handler.Cors())
+
 	r = route.PathRoute(r)
 
 	r.Run(":6991")
