@@ -7,3 +7,19 @@ export function login(data) {
         data
     });
 }
+
+export function netLogin(data) {
+    return request({
+        url: '/gin/user/netLogin',
+        method: 'post',
+        data
+    });
+}
+
+export function register(data) {
+    return request({
+        url: '/gin/user/register',
+        method: 'post',
+        data
+    });
+}

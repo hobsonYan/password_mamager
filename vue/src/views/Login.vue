@@ -20,6 +20,38 @@
                     <el-form-item class="btn-ground">
                         <el-button type="primary" @click="submitForm('loginForm')">Login</el-button>
                         <el-button @click="resetForm('loginForm')">Reset</el-button>
+                        <el-button @click="dialog = true">Register</el-button>
+
+                        <el-drawer 
+                            title="USER REGISTER"
+                            :before-close="handleClose" 
+                            :visible.sync="dialog"
+                            :modal-append-to-body="false"
+                            direction="rtl" 
+                            customer-class="register-drawer" 
+                            ref="drawer"
+                            >
+                            <div class="register-drawer_content">
+                                <el-form :model="registerForm" :rules="rules" ref="registerForm" label-width="25%" class="registerForm">
+                                    <el-form-item label="ACCOUNT"  prop="username" style="width: 380px">
+                                        <el-input v-model="registerForm.username" autocomplete="off"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="PASSWORD" prop="password" style="width: 380px">
+                                        <el-input v-model="registerForm.password" autocomplete="off"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="PHONE" prop="phone" style="width: 380px">
+                                        <el-input v-model="registerForm.phone" autocomplete="off"></el-input>
+                                    </el-form-item>
+                                </el-form>
+                                <div class="register-drawer_foolter">
+                                    <el-button @click="cancelForm">Cancel</el-button>
+                                    <el-button type="primary" @click="$ref.drawer.closeDrawer()" :loading="loading">{{loading ? 'submiting...' : 'confirm'}}</el-button>
+                                </div>
+                            </div>
+                        </el-drawer>
+                    </el-form-item>
+                    <el-form-item label="net login" prop="netLogin">
+                        <el-switch v-model="loginForm.netLogin"></el-switch>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -30,15 +62,24 @@
 <script>
 import ElementUI from 'element-ui';
 import router from "@/router"
-import {login} from '@/api/login'
+import {login, netLogin, register} from '@/api/login'
 
 export default {
     name: "Login",
     data() {
         return {
+            dialog: false,
+            loading: false,
+            timer: null,
+            registerForm: {
+                username: '',
+                password: '',
+                phone: ''
+            },
             loginForm: {
                 username: '',
-                password: ''
+                password: '',
+                netLogin: false
             },
             rules: {
                 username: [
@@ -48,6 +89,9 @@ export default {
                 password: [
                     {required: true, message: 'Please enter your password', trigger: "blur"},
                     {min: 1, max: 100, message: 'The length is between 1 and 100', trigger: "blur"}
+                ],
+                phone:[
+                    {required: true, message: 'Please enter your phone', trigger: "blur"}
                 ]
             }
         };
@@ -56,35 +100,38 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    login({username:this.loginForm.username, password:this.loginForm.password}).then(res => {
-                        let success = JSON.parse(res.data.success);
-                        let message = res.data.msg;
-                        if (success) {
-                            
-                            // 登录成功
-                            ElementUI.Message.success(message);
-                            // 跳转页面
-                            router.push('/hello')
-                        } else {
-                            // 打印错误信息
-                            ElementUI.Message.error(message);
-                        }
-                    })
-                    // this.$axios.post('/login', this.loginForm).then(res => {
-                    //     console.log('return: ', res)
-                    //     let result = JSON.parse(res.data.data);
-                    //     let message = res.data.msg;
-
-                    //     if (result) {
-                    //         // 登录成功
-                    //         ElementUI.Message.success(message);
-                    //         // 跳转页面
-                    //         router.push('/hello')
-                    //     } else {
-                    //         // 打印错误信息
-                    //         ElementUI.Message.error(message);
-                    //     }
-                    // })
+                    console.log("form", this.loginForm)
+                    if (!this.loginForm.netLogin) {
+                        login({username:this.loginForm.username, password:this.loginForm.password}).then(res => {
+                            let success = JSON.parse(res.data.success);
+                            let message = res.data.msg;
+                            if (success) {
+                                
+                                // 登录成功
+                                ElementUI.Message.success(message);
+                                // 跳转页面
+                                router.push('/hello')
+                            } else {
+                                // 打印错误信息
+                                ElementUI.Message.error(message);
+                            }
+                        })
+                    } else {
+                        netLogin({username:this.loginForm.username, password:this.loginForm.password}).then(res => {
+                            let success = JSON.parse(res.data.success);
+                            let message = res.data.msg;
+                            if (success) {
+                                
+                                // 登录成功
+                                ElementUI.Message.success(message);
+                                // 跳转页面
+                                router.push('/hello')
+                            } else {
+                                // 打印错误信息
+                                ElementUI.Message.error(message);
+                            }
+                        })
+                    }
                 } else {
                     console.log('error submit');
                     return false;
@@ -93,8 +140,28 @@ export default {
         },
         resetForm(formName) {
             this.$refs[formName].resetFields();
+        },
+        handleClose(done) {
+            if (this.loading) {
+                return;
+            }
+            this.$confirm('submit it ?').then(_ => {
+                this.loading = true;
+                this.timer = setTimeout(() => {
+                    done();
+                    setTimeout(() => {
+                        this.loading = false;
+                    }, 400);
+                }, 2000);
+            })
+            .catch(_ => {})
         }
     },
+    cancelForm() {
+        this.loading = false;
+        this.dialog = false;
+        clearTimeout(this.timer);
+    }
 }
 </script>
 
